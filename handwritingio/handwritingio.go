@@ -20,6 +20,20 @@ type Handwriting struct {
 	RatingCharacterWidth int       `json:"rating_character_width"`
 }
 
+type HandwritingListParams struct {
+	Offset   int
+	Limit    int
+	OrderBy  string
+	OrderDir string
+}
+
+var DefaultHandwritingListParams = HandwritingListParams{
+	Offset:   0,
+	Limit:    200,
+	OrderBy:  "id",
+	OrderDir: "asc",
+}
+
 type Client struct {
 	client *http.Client
 	url    *url.URL
@@ -34,12 +48,12 @@ func NewClient(u *url.URL) *Client {
 	return &c
 }
 
-func (c *Client) ListHandwritings(offset, limit int, order_by, order_direction string) (handwritings []Handwriting, err error) {
+func (c *Client) ListHandwritings(params HandwritingListParams) (handwritings []Handwriting, err error) {
 	values := url.Values{}
-	values.Add("offset", strconv.Itoa(offset))
-	values.Add("limit", strconv.Itoa(limit))
-	values.Add("order_by", order_by)
-	values.Add("order_dir", order_direction)
+	values.Add("offset", strconv.Itoa(params.Offset))
+	values.Add("limit", strconv.Itoa(params.Limit))
+	values.Add("order_by", params.OrderBy)
+	values.Add("order_dir", params.OrderDir)
 	reqURL := c.url.Scheme + "://" + c.url.Host + "/handwritings?" + values.Encode()
 	req, err := http.NewRequest("GET", reqURL, nil)
 	if err != nil {
