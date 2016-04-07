@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-func ExampleClient_List() {
+func ExampleClient_ListHandwritings() {
 
 	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
 	if err != nil {
@@ -15,7 +15,7 @@ func ExampleClient_List() {
 		return
 	}
 
-	var params HandwritingListParams = DefaultHandwritingListParams
+	var params = DefaultHandwritingListParams
 	params.Limit = 5
 	c := NewClient(u)
 

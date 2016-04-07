@@ -1,3 +1,4 @@
+// Package handwritingio provides a client library for interacting with the handwriting.io API
 package handwritingio
 
 import (
@@ -10,23 +11,37 @@ import (
 	"time"
 )
 
+// Handwriting contains information about a handwriting style
 type Handwriting struct {
-	ID                   string    `json:"id"`
-	Title                string    `json:"title"`
-	Created              time.Time `json:"date_created"`
-	Modified             time.Time `json:"date_modified"`
-	RatingNeatness       int       `json:"rating_neatness"`
-	RatingEmbellishment  int       `json:"rating_embellishment"`
-	RatingCharacterWidth int       `json:"rating_character_width"`
+	// ID is an unique identifier for the handwriting style
+	ID string `json:"id"`
+	// Title is human friendly name for the handwriting
+	Title string `json:"title"`
+	// Created is when the handwriting was created
+	Created time.Time `json:"date_created"`
+	// Modified is when then handwriting was last modified
+	Modified time.Time `json:"date_modified"`
+	// RatingNeatness is a rating of how "neat" a handwriting is relative to others
+	RatingNeatness int `json:"rating_neatness"`
+	// RatingEmbellishment is a rating of how "embellished" a handwriting is relative to others
+	RatingEmbellishment int `json:"rating_embellishment"`
+	// RatingCharacterWidth is a rating of how wide a handwriting is relative to others
+	RatingCharacterWidth int `json:"rating_character_width"`
 }
 
+// HandwritingListParams contains the parameters for listing handwritings
 type HandwritingListParams struct {
-	Offset   int
-	Limit    int
-	OrderBy  string
+	// Offset is the number of handwritings to skip at the beginning of the list.  Useful for pagination.
+	Offset int
+	// Limit is the maximum number of handwritings to return.  Useful for pagination
+	Limit int
+	// OrderBy is the name of the field to use for sorting
+	OrderBy string
+	// OrderDir is the direction to sort.  Use "asc" for ascending, "desc" for descending.
 	OrderDir string
 }
 
+// DefaultHandwritingListParams are the default values for HandwritingListParams
 var DefaultHandwritingListParams = HandwritingListParams{
 	Offset:   0,
 	Limit:    200,
@@ -34,11 +49,13 @@ var DefaultHandwritingListParams = HandwritingListParams{
 	OrderDir: "asc",
 }
 
+// Client is a client for making API calls
 type Client struct {
 	client *http.Client
 	url    *url.URL
 }
 
+// NewClient constructs a Client from a URL
 func NewClient(u *url.URL) *Client {
 	client := http.DefaultClient
 	c := Client{
@@ -48,6 +65,7 @@ func NewClient(u *url.URL) *Client {
 	return &c
 }
 
+// ListHandwritings retreives a list of handwrings
 func (c *Client) ListHandwritings(params HandwritingListParams) (handwritings []Handwriting, err error) {
 	values := url.Values{}
 	values.Add("offset", strconv.Itoa(params.Offset))
