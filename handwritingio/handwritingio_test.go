@@ -30,3 +30,27 @@ func ExampleClient_ListHandwritings() {
 	// Output:
 	// ListHandwritings returned 5 Handwritings
 }
+
+func ExampleClient_GetHandwriting() {
+	id := "2D5S46A80003"
+
+	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
+	if err != nil {
+		fmt.Println("Make sure you have your environment variable HANDWRITINGIO_API_URL set correctly")
+		fmt.Println(err)
+		return
+	}
+
+	c := NewClient(u)
+
+	handwriting, err := c.GetHandwriting(id)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	fmt.Println(handwriting.Title)
+
+	// Output:
+	// Perry
+}

@@ -1,6 +1,8 @@
 .PHONY: test
 test: ## Run relevant tests
-	go test ./handwritingio
+	go test ./handwritingio && \
+	go vet ./handwritingio && \
+	golint ./handwritingio
 
 .PHONY: help
 help: # Borrowed from http://marmelab.com/blog/2016/02/29/auto-documented-makefile.html

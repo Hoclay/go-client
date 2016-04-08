@@ -57,6 +57,7 @@ type Client struct {
 
 // NewClient constructs a Client from a URL
 func NewClient(u *url.URL) *Client {
+	// FIXME move url validation up into the constructor for better error messaging
 	client := http.DefaultClient
 	c := Client{
 		client: client,
@@ -65,7 +66,7 @@ func NewClient(u *url.URL) *Client {
 	return &c
 }
 
-// ListHandwritings retreives a list of handwrings
+// ListHandwritings retrieves a list of handwritings
 func (c *Client) ListHandwritings(params HandwritingListParams) (handwritings []Handwriting, err error) {
 	values := url.Values{}
 	values.Add("offset", strconv.Itoa(params.Offset))
@@ -105,5 +106,44 @@ func (c *Client) ListHandwritings(params HandwritingListParams) (handwritings []
 	}
 
 	err = json.Unmarshal(body, &handwritings)
+	return
+}
+
+// GetHandwriting retrieves a single of handwriting
+func (c *Client) GetHandwriting(id string) (handwriting Handwriting, err error) {
+	reqURL := c.url.Scheme + "://" + c.url.Host + "/handwritings/" + id
+
+	req, err := http.NewRequest("GET", reqURL, nil)
+	if err != nil {
+		return
+	}
+
+	if c.url.User == nil {
+		err = errors.New("token key and secret are required")
+		return
+	}
+
+	password, ok := c.url.User.Password()
+	if !ok {
+		err = errors.New("token secret is required")
+		return
+	}
+	req.SetBasicAuth(c.url.User.Username(), password)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
+
+	if resp.StatusCode != 200 {
+		// FIXME
+		err = errors.New("NOT IMPLEMENTED")
+		return
+	}
+
+	err = json.Unmarshal(body, &handwriting)
 	return
 }
