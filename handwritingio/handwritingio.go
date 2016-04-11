@@ -122,25 +122,8 @@ func (c *Client) ListHandwritings(params HandwritingListParams) (handwritings []
 	values.Add("limit", strconv.Itoa(params.Limit))
 	values.Add("order_by", params.OrderBy)
 	values.Add("order_dir", params.OrderDir)
-	reqURL := c.url.Scheme + "://" + c.url.Host + "/handwritings?" + values.Encode()
-	req, err := http.NewRequest("GET", reqURL, nil)
-	if err != nil {
-		return
-	}
 
-	if c.url.User == nil {
-		err = errors.New("token key and secret are required")
-		return
-	}
-
-	password, ok := c.url.User.Password()
-	if !ok {
-		err = errors.New("token secret is required")
-		return
-	}
-	req.SetBasicAuth(c.url.User.Username(), password)
-
-	resp, err := c.client.Do(req)
+	resp, err := c.get("/handwritings", values)
 	if err != nil {
 		return
 	}
@@ -160,26 +143,7 @@ func (c *Client) ListHandwritings(params HandwritingListParams) (handwritings []
 
 // GetHandwriting retrieves a single of handwriting
 func (c *Client) GetHandwriting(id string) (handwriting Handwriting, err error) {
-	reqURL := c.url.Scheme + "://" + c.url.Host + "/handwritings/" + id
-
-	req, err := http.NewRequest("GET", reqURL, nil)
-	if err != nil {
-		return
-	}
-
-	if c.url.User == nil {
-		err = errors.New("token key and secret are required")
-		return
-	}
-
-	password, ok := c.url.User.Password()
-	if !ok {
-		err = errors.New("token secret is required")
-		return
-	}
-	req.SetBasicAuth(c.url.User.Username(), password)
-
-	resp, err := c.client.Do(req)
+	resp, err := c.get("/handwritings/"+id, nil)
 	if err != nil {
 		return
 	}
@@ -211,25 +175,7 @@ func (c *Client) RenderPNG(params RenderParamsPNG) (r io.ReadCloser, err error) 
 	values.Add("word_spacing_variance", strconv.FormatFloat(params.WordSpacingVariance, 'f', -1, 64))
 	values.Add("random_seed", strconv.FormatInt(params.RandomSeed, 10))
 
-	reqURL := c.url.Scheme + "://" + c.url.Host + "/render/png?" + values.Encode()
-	req, err := http.NewRequest("GET", reqURL, nil)
-	if err != nil {
-		return
-	}
-
-	if c.url.User == nil {
-		err = errors.New("token key and secret are required")
-		return
-	}
-
-	password, ok := c.url.User.Password()
-	if !ok {
-		err = errors.New("token secret is required")
-		return
-	}
-	req.SetBasicAuth(c.url.User.Username(), password)
-
-	resp, err := c.client.Do(req)
+	resp, err := c.get("/render/png", values)
 	if err != nil {
 		return
 	}
@@ -260,7 +206,29 @@ func (c *Client) RenderPDF(params RenderParamsPDF) (r io.ReadCloser, err error) 
 	values.Add("word_spacing_variance", strconv.FormatFloat(params.WordSpacingVariance, 'f', -1, 64))
 	values.Add("random_seed", strconv.FormatInt(params.RandomSeed, 10))
 
-	reqURL := c.url.Scheme + "://" + c.url.Host + "/render/pdf?" + values.Encode()
+	resp, err := c.get("/render/pdf", values)
+	if err != nil {
+		return
+	}
+
+	if resp.StatusCode != 200 {
+		fmt.Println(err)
+		bs, _ := ioutil.ReadAll(resp.Body)
+		fmt.Println(string(bs))
+		err = errors.New("NOT IMPLEMENTED")
+		return
+	}
+
+	r = resp.Body
+	return
+}
+
+func (c *Client) get(path string, values url.Values) (resp *http.Response, err error) {
+	reqURL := c.url.Scheme + "://" + c.url.Host + path
+	if values != nil && len(values) > 0 {
+		reqURL += "?" + values.Encode()
+	}
+
 	req, err := http.NewRequest("GET", reqURL, nil)
 	if err != nil {
 		return
@@ -278,19 +246,6 @@ func (c *Client) RenderPDF(params RenderParamsPDF) (r io.ReadCloser, err error) 
 	}
 	req.SetBasicAuth(c.url.User.Username(), password)
 
-	resp, err := c.client.Do(req)
-	if err != nil {
-		return
-	}
-
-	if resp.StatusCode != 200 {
-		fmt.Println(err)
-		bs, _ := ioutil.ReadAll(resp.Body)
-		fmt.Println(string(bs))
-		err = errors.New("NOT IMPLEMENTED")
-		return
-	}
-
-	r = resp.Body
+	resp, err = c.client.Do(req)
 	return
 }
