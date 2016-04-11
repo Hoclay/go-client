@@ -19,7 +19,11 @@ func ExampleClient_ListHandwritings() {
 
 	var params = DefaultHandwritingListParams
 	params.Limit = 5
-	c := NewClient(u)
+	c, err := NewClient(u)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	handwritings, err := c.ListHandwritings(params)
 	if err != nil {
@@ -43,7 +47,11 @@ func ExampleClient_GetHandwriting() {
 		return
 	}
 
-	c := NewClient(u)
+	c, err := NewClient(u)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	handwriting, err := c.GetHandwriting(id)
 	if err != nil {
@@ -65,7 +73,11 @@ func ExampleClient_RenderPNG() {
 		return
 	}
 
-	c := NewClient(u)
+	c, err := NewClient(u)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	var params = DefaultRenderParamsPNG
 	// Perry
@@ -108,7 +120,11 @@ func ExampleClient_RenderPDF() {
 		return
 	}
 
-	c := NewClient(u)
+	c, err := NewClient(u)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
 
 	var params = DefaultRenderParamsPDF
 	// Perry

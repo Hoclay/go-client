@@ -5,8 +5,6 @@ package handwritingio
 
 import (
 	"encoding/json"
-	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -102,17 +100,29 @@ var DefaultRenderParamsPDF = RenderParamsPDF{
 type Client struct {
 	client *http.Client
 	url    *url.URL
+	Key    string
+	Secret string
 }
 
 // NewClient constructs a Client from a URL
-func NewClient(u *url.URL) *Client {
-	// FIXME move url validation up into the constructor for better error messaging
-	client := http.DefaultClient
-	c := Client{
-		client: client,
-		url:    u,
+func NewClient(u *url.URL) (*Client, error) {
+
+	if u.User == nil {
+		return nil, TokenError("token key and secret are required")
 	}
-	return &c
+
+	password, ok := u.User.Password()
+	if !ok {
+		return nil, TokenError("token secret is required")
+	}
+
+	c := Client{
+		client: http.DefaultClient,
+		url:    u,
+		Key:    u.User.Username(),
+		Secret: password,
+	}
+	return &c, nil
 }
 
 // ListHandwritings retrieves a list of handwritings
@@ -128,14 +138,13 @@ func (c *Client) ListHandwritings(params HandwritingListParams) (handwritings []
 		return
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-
 	if resp.StatusCode != 200 {
-		// FIXME
-		err = errors.New("NOT IMPLEMENTED")
+		err = responseError(resp)
 		return
 	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
 
 	err = json.Unmarshal(body, &handwritings)
 	return
@@ -148,14 +157,13 @@ func (c *Client) GetHandwriting(id string) (handwriting Handwriting, err error) 
 		return
 	}
 
-	body, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
-
 	if resp.StatusCode != 200 {
-		// FIXME
-		err = errors.New("NOT IMPLEMENTED")
+		err = responseError(resp)
 		return
 	}
+
+	body, err := ioutil.ReadAll(resp.Body)
+	resp.Body.Close()
 
 	err = json.Unmarshal(body, &handwriting)
 	return
@@ -181,10 +189,7 @@ func (c *Client) RenderPNG(params RenderParamsPNG) (r io.ReadCloser, err error) 
 	}
 
 	if resp.StatusCode != 200 {
-		fmt.Println(err)
-		bs, _ := ioutil.ReadAll(resp.Body)
-		fmt.Println(string(bs))
-		err = errors.New("NOT IMPLEMENTED")
+		err = responseError(resp)
 		return
 	}
 
@@ -212,10 +217,7 @@ func (c *Client) RenderPDF(params RenderParamsPDF) (r io.ReadCloser, err error) 
 	}
 
 	if resp.StatusCode != 200 {
-		fmt.Println(err)
-		bs, _ := ioutil.ReadAll(resp.Body)
-		fmt.Println(string(bs))
-		err = errors.New("NOT IMPLEMENTED")
+		err = responseError(resp)
 		return
 	}
 
@@ -233,18 +235,7 @@ func (c *Client) get(path string, values url.Values) (resp *http.Response, err e
 	if err != nil {
 		return
 	}
-
-	if c.url.User == nil {
-		err = errors.New("token key and secret are required")
-		return
-	}
-
-	password, ok := c.url.User.Password()
-	if !ok {
-		err = errors.New("token secret is required")
-		return
-	}
-	req.SetBasicAuth(c.url.User.Username(), password)
+	req.SetBasicAuth(c.Key, c.Secret)
 
 	resp, err = c.client.Do(req)
 	return
