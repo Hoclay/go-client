@@ -4,6 +4,8 @@ package handwritingio
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
@@ -47,6 +49,62 @@ var DefaultHandwritingListParams = HandwritingListParams{
 	Limit:    200,
 	OrderBy:  "id",
 	OrderDir: "asc",
+}
+
+// RenderParamsPNG contains the parameters for rendering a PNG image
+type RenderParamsPNG struct {
+	HandwritingID       string
+	Text                string
+	HandwritingSize     string
+	HandwritingColor    string
+	Width               string
+	Height              string
+	LineSpacing         float64
+	LineSpacingVariance float64
+	WordSpacingVariance float64
+	RandomSeed          int64
+}
+
+// DefaultRenderParamsPNG are the default values for RenderParamsPNG
+var DefaultRenderParamsPNG = RenderParamsPNG{
+	HandwritingID:       "",
+	Text:                "",
+	HandwritingSize:     "20px",
+	HandwritingColor:    "#000000",
+	Width:               "504px",
+	Height:              "360px",
+	LineSpacing:         1.5,
+	LineSpacingVariance: 0,
+	WordSpacingVariance: 0,
+	RandomSeed:          -1,
+}
+
+// RenderParamsPDF contains the parameters for rendering a PDF image
+type RenderParamsPDF struct {
+	HandwritingID       string
+	Text                string
+	HandwritingSize     string
+	HandwritingColor    string
+	Width               string
+	Height              string
+	LineSpacing         float64
+	LineSpacingVariance float64
+	WordSpacingVariance float64
+	RandomSeed          int64
+}
+
+// DefaultRenderParamsPDF are the default values for RenderParamsPDF
+var DefaultRenderParamsPDF = RenderParamsPDF{
+	HandwritingID:       "",
+	Text:                "",
+	HandwritingSize:     "20pt",
+	HandwritingColor:    "(0, 0, 0, 1)",
+	Width:               "7in",
+	Height:              "5in",
+	LineSpacing:         1.5,
+	LineSpacingVariance: 0,
+	WordSpacingVariance: 0,
+	RandomSeed:          -1,
 }
 
 // Client is a client for making API calls
@@ -145,5 +203,103 @@ func (c *Client) GetHandwriting(id string) (handwriting Handwriting, err error) 
 	}
 
 	err = json.Unmarshal(body, &handwriting)
+	return
+}
+
+// RenderPNG calls the API to produce a PNG image
+func (c *Client) RenderPNG(params RenderParamsPNG) (r io.ReadCloser, err error) {
+	values := url.Values{}
+	values.Add("handwriting_id", params.HandwritingID)
+	values.Add("text", params.Text)
+	values.Add("handwriting_size", params.HandwritingSize)
+	values.Add("handwriting_color", params.HandwritingColor)
+	values.Add("width", params.Width)
+	values.Add("height", params.Height)
+	values.Add("line_spacing", strconv.FormatFloat(params.LineSpacing, 'f', -1, 64))
+	values.Add("line_spacing_variance", strconv.FormatFloat(params.LineSpacingVariance, 'f', -1, 64))
+	values.Add("word_spacing_variance", strconv.FormatFloat(params.WordSpacingVariance, 'f', -1, 64))
+	values.Add("random_seed", strconv.FormatInt(params.RandomSeed, 10))
+
+	reqURL := c.url.Scheme + "://" + c.url.Host + "/render/png?" + values.Encode()
+	req, err := http.NewRequest("GET", reqURL, nil)
+	if err != nil {
+		return
+	}
+
+	if c.url.User == nil {
+		err = errors.New("token key and secret are required")
+		return
+	}
+
+	password, ok := c.url.User.Password()
+	if !ok {
+		err = errors.New("token secret is required")
+		return
+	}
+	req.SetBasicAuth(c.url.User.Username(), password)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+
+	if resp.StatusCode != 200 {
+		fmt.Println(err)
+		bs, _ := ioutil.ReadAll(resp.Body)
+		fmt.Println(string(bs))
+		err = errors.New("NOT IMPLEMENTED")
+		return
+	}
+
+	r = resp.Body
+	return
+}
+
+// RenderPDF calls the API to produce a PDF image
+func (c *Client) RenderPDF(params RenderParamsPDF) (r io.ReadCloser, err error) {
+	values := url.Values{}
+	values.Add("handwriting_id", params.HandwritingID)
+	values.Add("text", params.Text)
+	values.Add("handwriting_size", params.HandwritingSize)
+	values.Add("handwriting_color", params.HandwritingColor)
+	values.Add("width", params.Width)
+	values.Add("height", params.Height)
+	values.Add("line_spacing", strconv.FormatFloat(params.LineSpacing, 'f', -1, 64))
+	values.Add("line_spacing_variance", strconv.FormatFloat(params.LineSpacingVariance, 'f', -1, 64))
+	values.Add("word_spacing_variance", strconv.FormatFloat(params.WordSpacingVariance, 'f', -1, 64))
+	values.Add("random_seed", strconv.FormatInt(params.RandomSeed, 10))
+
+	reqURL := c.url.Scheme + "://" + c.url.Host + "/render/pdf?" + values.Encode()
+	req, err := http.NewRequest("GET", reqURL, nil)
+	if err != nil {
+		return
+	}
+
+	if c.url.User == nil {
+		err = errors.New("token key and secret are required")
+		return
+	}
+
+	password, ok := c.url.User.Password()
+	if !ok {
+		err = errors.New("token secret is required")
+		return
+	}
+	req.SetBasicAuth(c.url.User.Username(), password)
+
+	resp, err := c.client.Do(req)
+	if err != nil {
+		return
+	}
+
+	if resp.StatusCode != 200 {
+		fmt.Println(err)
+		bs, _ := ioutil.ReadAll(resp.Body)
+		fmt.Println(string(bs))
+		err = errors.New("NOT IMPLEMENTED")
+		return
+	}
+
+	r = resp.Body
 	return
 }
