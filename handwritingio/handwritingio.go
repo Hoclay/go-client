@@ -139,11 +139,6 @@ func (c *Client) ListHandwritings(params HandwritingListParams) (handwritings []
 		return
 	}
 
-	if resp.StatusCode != 200 {
-		err = responseError(resp)
-		return
-	}
-
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
@@ -158,12 +153,10 @@ func (c *Client) GetHandwriting(id string) (handwriting Handwriting, err error) 
 		return
 	}
 
-	if resp.StatusCode != 200 {
-		err = responseError(resp)
+	body, err := ioutil.ReadAll(resp.Body)
+	if err != nil {
 		return
 	}
-
-	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
 	err = json.Unmarshal(body, &handwriting)
@@ -186,11 +179,6 @@ func (c *Client) RenderPNG(params RenderParamsPNG) (r io.ReadCloser, err error) 
 
 	resp, err := c.get("/render/png", values)
 	if err != nil {
-		return
-	}
-
-	if resp.StatusCode != 200 {
-		err = responseError(resp)
 		return
 	}
 
@@ -217,11 +205,6 @@ func (c *Client) RenderPDF(params RenderParamsPDF) (r io.ReadCloser, err error) 
 		return
 	}
 
-	if resp.StatusCode != 200 {
-		err = responseError(resp)
-		return
-	}
-
 	r = resp.Body
 	return
 }
@@ -239,5 +222,13 @@ func (c *Client) get(path string, values url.Values) (resp *http.Response, err e
 	req.SetBasicAuth(c.Key, c.Secret)
 
 	resp, err = c.client.Do(req)
+	if err != nil {
+		return
+	}
+
+	if resp.StatusCode != 200 {
+		err = responseError(resp)
+	}
+
 	return
 }
