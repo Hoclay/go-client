@@ -18,4 +18,4 @@ Install the package
 
 See code examples in [GoDoc](http://godoc.org/github.com/handwritingio/go-client/handwritingio)
 
-Additional [API Documentation](https://www-staging.handwriting.io/docs) and [Live Demo](https://www-staging.handwriting.io/demo/) at [Handwriting.io](https://www-staging.handwriting.io/)
+Additional [API Documentation](https://www.handwriting.io/docs) and [Live Demo](https://www.handwriting.io/demo/) at [Handwriting.io](https://www.handwriting.io/)
