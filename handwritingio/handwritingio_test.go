@@ -6,6 +6,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"testing"
 )
 
 func ExampleClient_ListHandwritings() {
@@ -63,6 +64,51 @@ func ExampleClient_GetHandwriting() {
 
 	// Output:
 	// Perry
+}
+
+func TestClient_GetHandwriting(t *testing.T) {
+	id := "2D5S46A80003"
+
+	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	c, err := NewClient(u)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	handwriting, err := c.GetHandwriting(id)
+	if err != nil {
+		t.Error(err)
+		return
+	}
+
+	if handwriting.Title != "Perry" {
+		t.Fail()
+	}
+
+	if handwriting.ID != id {
+		t.Fail()
+	}
+
+	// Ratings default to 1400, and go up or down relative to other handwritings
+	// zero values would indicate deserialization problems
+	if handwriting.RatingNeatness == 0 {
+		t.Fail()
+	}
+	if handwriting.RatingCursivity == 0 {
+		t.Fail()
+	}
+	if handwriting.RatingEmbellishment == 0 {
+		t.Fail()
+	}
+	if handwriting.RatingCharacterWidth == 0 {
+		t.Fail()
+	}
 }
 
 func ExampleClient_RenderPNG() {

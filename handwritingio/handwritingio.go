@@ -20,6 +20,7 @@ type Handwriting struct {
 	Created              time.Time `json:"date_created"`
 	Modified             time.Time `json:"date_modified"`
 	RatingNeatness       int       `json:"rating_neatness"`
+	RatingCursivity      int       `json:"rating_cursivity"`
 	RatingEmbellishment  int       `json:"rating_embellishment"`
 	RatingCharacterWidth int       `json:"rating_character_width"`
 }
