@@ -5,13 +5,17 @@ package handwritingio
 
 import (
 	"encoding/json"
+	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"runtime"
 	"strconv"
 	"time"
 )
+
+var userAgent = fmt.Sprintf("Handwriting.io Go Client (2016-04-13 %s)", runtime.Version())
 
 // Handwriting contains information about a handwriting style
 type Handwriting struct {
@@ -219,6 +223,7 @@ func (c *Client) get(path string, values url.Values) (resp *http.Response, err e
 	if err != nil {
 		return
 	}
+	req.Header.Set("User-Agent", userAgent)
 	req.SetBasicAuth(c.Key, c.Secret)
 
 	resp, err = c.client.Do(req)
