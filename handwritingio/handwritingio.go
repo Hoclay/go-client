@@ -5,17 +5,15 @@ package handwritingio
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
-	"runtime"
 	"strconv"
 	"time"
 )
 
-var userAgent = fmt.Sprintf("Handwriting.io Go Client (2016-04-13 %s)", runtime.Version())
+const userAgent = "handwritingio-go-client/1.0.0"
 
 // Handwriting contains information about a handwriting style
 type Handwriting struct {
