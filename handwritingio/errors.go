@@ -13,54 +13,48 @@ func (e TokenError) Error() string {
 	return string(e)
 }
 
-// Error indicates an error response returned by the API
-type Error struct {
-	StatusCode int
-	Body       []byte
-	Message    string
+// APIErrors indicates an error response returned by the API.
+type APIErrors struct {
+	StatusCode int        `json:"-"`
+	Body       []byte     `json:"-"`
+	Errors     []APIError `json:"errors"`
 }
 
-type jsonErrors struct {
-	Errors []jsonError `json:"errors"`
+// APIError is a single error in the response from the API.
+//
+// There can be one or more per response.
+type APIError struct {
+	Error string `json:"error"`
+	Field string `json:"field"`
 }
 
-type jsonError struct {
-	Message string `json:"error"`
-}
-
-func responseError(resp *http.Response) Error {
-	e := Error{StatusCode: resp.StatusCode}
+func responseError(resp *http.Response) error {
+	e := APIErrors{StatusCode: resp.StatusCode}
 
 	body, err := ioutil.ReadAll(resp.Body)
 	resp.Body.Close()
 
 	if err != nil {
-		e.Message = err.Error()
-		return e
+		return err
 	}
 
 	e.Body = body
 
-	jes := jsonErrors{}
-	err = json.Unmarshal(body, &jes)
+	err = json.Unmarshal(body, &e)
 	if err != nil {
-		e.Message = err.Error()
-		return e
-	}
-
-	if len(jes.Errors) == 0 {
-		e.Message = "unknown error"
-		return e
-	}
-	je := jes.Errors[0]
-	e.Message = je.Message
-	if e.Message == "" {
-		e.Message = "unknown error"
+		return err
 	}
 
 	return e
 }
 
-func (e Error) Error() string {
-	return e.Message
+// Error returns the message of the first APIError.
+func (e APIErrors) Error() string {
+	if e.Errors == nil || len(e.Errors) == 0 {
+		return "unknown error"
+	}
+	if len(e.Errors) == 1 {
+		return e.Errors[0].Error
+	}
+	return "multiple errors"
 }

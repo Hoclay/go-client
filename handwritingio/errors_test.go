@@ -3,6 +3,8 @@ package handwritingio
 import (
 	"net/url"
 	"os"
+	"sort"
+	"strings"
 	"testing"
 )
 
@@ -27,7 +29,7 @@ func TestAuthError(t *testing.T) {
 
 }
 
-func TestValidation(t *testing.T) {
+func TestMultipleErrors(t *testing.T) {
 	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
 	if err != nil {
 		t.Error(err)
@@ -43,9 +45,29 @@ func TestValidation(t *testing.T) {
 	params := DefaultRenderParamsPNG
 	params.HandwritingID = "2D5S46A80003" // Perry
 	params.Width = "5gophers"
+	params.Height = "80%"
+	params.HandwritingSize = "-5px"
 	_, err = c.RenderPNG(params)
-	if err.Error() != `width invalid unit: "gophers"` {
-		t.Error(err)
+
+	if es, ok := err.(APIErrors); ok {
+		fields := []string{}
+		for _, e := range es.Errors {
+			fields = append(fields, e.Field)
+		}
+		sort.Strings(fields)
+		expected := "handwriting_size height width"
+		actual := strings.Join(fields, " ")
+		if expected != actual {
+			t.Logf("expected fields: %#v", expected)
+			t.Logf("actual fields: %#v", actual)
+			t.Fail()
+		}
+	} else {
+		t.Error("error returned was not APIErrors")
+	}
+
+	if err.Error() != "multiple errors" {
+		t.Fail()
 	}
 
 }
