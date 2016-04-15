@@ -178,6 +178,12 @@ version number will match the Handwriting.io API version number, and the
 The `patch` version will be incremented for bug fixes and changes that add
 functionality only.
 
+Tagged releases are compatible with [gopkg.in](http://labix.org/gopkg.in) versioning.
+
+```
+go get gopkg.in/handwritingio/go-client.v1/handwritingio
+```
+
 ## Issues
 
 Please open an issue on [Github](https://github.com/handwritingio/go-client/issues)
