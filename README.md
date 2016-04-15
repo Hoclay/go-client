@@ -10,7 +10,7 @@
 
 Set up the client, render an image, and write it to a file:
 
-```golang
+```go
 package main
 
 import (
@@ -70,7 +70,7 @@ If all goes well, this should create an image similar to the following:
 ## Advanced Examples
 
 Overlaying handwriting on a background image:
-```golang
+```go
 package main
 
 import (
