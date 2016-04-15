@@ -15,7 +15,7 @@ func TestAuthError(t *testing.T) {
 		return
 	}
 
-	c, err := NewClient(u)
+	c, err := NewClientURL(u)
 	if err != nil {
 		t.Error(err)
 		return
@@ -36,7 +36,7 @@ func TestMultipleErrors(t *testing.T) {
 		return
 	}
 
-	c, err := NewClient(u)
+	c, err := NewClientURL(u)
 	if err != nil {
 		t.Error(err)
 		return

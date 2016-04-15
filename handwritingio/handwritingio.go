@@ -107,8 +107,11 @@ type Client struct {
 	Secret string
 }
 
-// NewClient constructs a Client from a URL
-func NewClient(u *url.URL) (*Client, error) {
+// NewClientURL constructs a Client from a URL
+//
+// Example URL:
+//   u, err := url.Parse("https://key:secret@api.handwriting.io")
+func NewClientURL(u *url.URL) (*Client, error) {
 
 	if u.User == nil {
 		return nil, TokenError("token key and secret are required")
@@ -124,6 +127,27 @@ func NewClient(u *url.URL) (*Client, error) {
 		url:    u,
 		Key:    u.User.Username(),
 		Secret: password,
+	}
+	return &c, nil
+}
+
+// NewClient constructs a Client with a given key and secret
+func NewClient(key, secret string) (*Client, error) {
+	u, _ := url.Parse("https://api.handwriting.io")
+
+	if key == "" {
+		return nil, TokenError("token key is required")
+	}
+
+	if secret == "" {
+		return nil, TokenError("token secret is required")
+	}
+
+	c := Client{
+		client: http.DefaultClient,
+		url:    u,
+		Key:    key,
+		Secret: secret,
 	}
 	return &c, nil
 }

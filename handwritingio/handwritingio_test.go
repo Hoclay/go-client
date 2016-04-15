@@ -20,7 +20,7 @@ func ExampleClient_ListHandwritings() {
 
 	var params = DefaultHandwritingListParams
 	params.Limit = 5
-	c, err := NewClient(u)
+	c, err := NewClientURL(u)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -48,7 +48,7 @@ func ExampleClient_GetHandwriting() {
 		return
 	}
 
-	c, err := NewClient(u)
+	c, err := NewClientURL(u)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -75,7 +75,7 @@ func TestClient_GetHandwriting(t *testing.T) {
 		return
 	}
 
-	c, err := NewClient(u)
+	c, err := NewClientURL(u)
 	if err != nil {
 		t.Error(err)
 		return
@@ -119,7 +119,7 @@ func ExampleClient_RenderPNG() {
 		return
 	}
 
-	c, err := NewClient(u)
+	c, err := NewClientURL(u)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -166,7 +166,7 @@ func ExampleClient_RenderPDF() {
 		return
 	}
 
-	c, err := NewClient(u)
+	c, err := NewClientURL(u)
 	if err != nil {
 		fmt.Println(err)
 		return

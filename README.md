@@ -23,14 +23,7 @@ import (
 )
 
 func main() {
-	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
-	if err != nil {
-		fmt.Println("Make sure you have your environment variable HANDWRITINGIO_API_URL set correctly")
-		fmt.Println(err)
-		return
-	}
-
-	c, err := handwritingio.NewClient(u)
+	c, err := handwritingio.NewClient("key", "secret")
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -108,14 +101,7 @@ func main() {
 	m := image.NewRGBA(image.Rect(0, 0, b.Dx(), b.Dy()))
 	draw.Draw(m, m.Bounds(), src, b.Min, draw.Src)
 
-	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
-	if err != nil {
-		fmt.Println("Make sure you have your environment variable HANDWRITINGIO_API_URL set correctly")
-		log.Fatal(err)
-		return
-	}
-
-	c, err := handwritingio.NewClient(u)
+	c, err := handwritingio.NewClient("key", "secret")
 	if err != nil {
 		fmt.Println(err)
 		return
