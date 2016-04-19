@@ -1,21 +1,13 @@
 package handwritingio
 
 import (
-	"net/url"
-	"os"
 	"sort"
 	"strings"
 	"testing"
 )
 
 func TestAuthError(t *testing.T) {
-	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	c, err := NewClientURL(u)
+	c, err := NewClient(key, secret)
 	if err != nil {
 		t.Error(err)
 		return
@@ -30,13 +22,7 @@ func TestAuthError(t *testing.T) {
 }
 
 func TestMultipleErrors(t *testing.T) {
-	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	c, err := NewClientURL(u)
+	c, err := NewClient(key, secret)
 	if err != nil {
 		t.Error(err)
 		return

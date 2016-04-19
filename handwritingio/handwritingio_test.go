@@ -3,24 +3,22 @@ package handwritingio
 import (
 	"fmt"
 	"io"
-	"net/url"
 	"os"
 	"path/filepath"
 	"testing"
 )
 
-func ExampleClient_ListHandwritings() {
+// Credentials here are a *Test* token
+// Output will be watermarked
+// Sign up for your own tokens at handwriting.io
+var key = "ATM2R4P1GDXBWGJW"
+var secret = "0SRXXN1VK75KQWK8"
 
-	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
-	if err != nil {
-		fmt.Println("Make sure you have your environment variable HANDWRITINGIO_API_URL set correctly")
-		fmt.Println(err)
-		return
-	}
+func ExampleClient_ListHandwritings() {
 
 	var params = DefaultHandwritingListParams
 	params.Limit = 5
-	c, err := NewClientURL(u)
+	c, err := NewClient(key, secret)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -41,14 +39,7 @@ func ExampleClient_ListHandwritings() {
 func ExampleClient_GetHandwriting() {
 	id := "2D5S46A80003"
 
-	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
-	if err != nil {
-		fmt.Println("Make sure you have your environment variable HANDWRITINGIO_API_URL set correctly")
-		fmt.Println(err)
-		return
-	}
-
-	c, err := NewClientURL(u)
+	c, err := NewClient(key, secret)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -69,13 +60,7 @@ func ExampleClient_GetHandwriting() {
 func TestClient_GetHandwriting(t *testing.T) {
 	id := "2D5S46A80003"
 
-	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	c, err := NewClientURL(u)
+	c, err := NewClient(key, secret)
 	if err != nil {
 		t.Error(err)
 		return
@@ -112,14 +97,7 @@ func TestClient_GetHandwriting(t *testing.T) {
 }
 
 func ExampleClient_RenderPNG() {
-	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
-	if err != nil {
-		fmt.Println("Make sure you have your environment variable HANDWRITINGIO_API_URL set correctly")
-		fmt.Println(err)
-		return
-	}
-
-	c, err := NewClientURL(u)
+	c, err := NewClient(key, secret)
 	if err != nil {
 		fmt.Println(err)
 		return
@@ -159,14 +137,7 @@ func ExampleClient_RenderPNG() {
 }
 
 func ExampleClient_RenderPDF() {
-	u, err := url.Parse(os.Getenv("HANDWRITINGIO_API_URL"))
-	if err != nil {
-		fmt.Println("Make sure you have your environment variable HANDWRITINGIO_API_URL set correctly")
-		fmt.Println(err)
-		return
-	}
-
-	c, err := NewClientURL(u)
+	c, err := NewClient(key, secret)
 	if err != nil {
 		fmt.Println(err)
 		return
