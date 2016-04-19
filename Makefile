@@ -1,6 +1,6 @@
 .PHONY: test
 test: ## Run relevant tests
-	go test ./handwritingio && \
+	go test ./handwritingio -coverprofile=coverage.out && \
 	go vet ./handwritingio && \
 	golint ./handwritingio
 
