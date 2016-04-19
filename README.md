@@ -1,8 +1,8 @@
 # Handwriting.io Client
 
 [![GoDoc](https://godoc.org/github.com/handwritingio/go-client/handwritingio?status.svg)](http://godoc.org/github.com/handwritingio/go-client/handwritingio)
-
 [![Go Report Card](https://goreportcard.com/badge/github.com/handwritingio/go-client)](https://goreportcard.com/report/github.com/handwritingio/go-client)
+[gocover.io](https://gocover.io/github.com/handwritingio/go-client/handwritingio)
 
 ## Installation
 
